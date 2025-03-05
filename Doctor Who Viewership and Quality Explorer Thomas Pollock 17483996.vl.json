@@ -1,0 +1,328 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data": {
+      "url": "https://raw.githubusercontent.com/thomaspollock123/COMP40610-Information-Visualisation/refs/heads/main/doctor_who_master_dataset.csv",
+      "format": {
+        "type": "csv",
+        "parse": {
+          "rating_n": "number"
+        }
+      }
+    },
+    "params": [
+      {
+        "name": "rating_choice",
+        "value": "rating_imdb",
+        "bind": {
+          "input": "select",
+          "options": ["rating_imdb", "rating_AI"],
+          "labels": ["IMDB Ratings", "Audience Index (AI) Ratings"],
+          "name": "Select Rating Type:"
+        }
+      }
+    ],
+    "title": {
+      "text": "Doctor Who Viewership and Quality Explorer",
+      "anchor": "middle",
+      "fontSize": 22,
+      "offset": 20
+    },
+    "vconcat": [
+      {
+        "hconcat": [
+          {
+            "width": 280,
+            "height": 250,
+            "title": "Viewer Engagement per Doctor Who Actor",
+            "mark": {
+              "type": "boxplot",
+              "ticks": true
+            },
+            "transform": [
+              {
+                "filter": {"param": "brush"}
+              },
+              {
+                "filter": {"param": "select_heatmap"}
+              },
+              {
+                "filter": "datum.rating_n < 19000"
+              }
+            ],
+            "encoding": {
+              "x": {
+                "field": "rating_n",
+                "type": "quantitative",
+                "title": "Count of IMDB Ratings Per Doctor",
+                "scale": {
+                  "domain": [0, 10500]
+                }
+              },
+              "y": {
+                "field": "doctor_who_actor",
+                "title": "Doctor Who Actor",
+                "type": "nominal",
+                "sort": ["Matt Smith/David Tennant/John Hurt", "Christopher Eccleston", "David Tennant", "Matt Smith", "Peter Capaldi", "Jodie Whittaker"]
+              },
+              "tooltip": [
+                {
+                  "field": "episode_title",
+                  "title": "Episode"
+                },
+                {
+                  "field": "rating_n",
+                  "title": "Number of Ratings"
+                }
+              ]
+            }
+          },
+          {
+            "width": 259,
+            "height": 250,
+            "layer": [
+              {
+                "title": "IMDB/Audience Index Ratings per Episode",
+                "mark": "rect",
+                "params": [
+                  {
+                    "name": "select_heatmap",
+                    "select": {
+                      "type": "interval",
+                      "encodings": ["x", "y"]
+                    }
+                  }
+                ],
+                "transform": [
+                  {
+                    "filter": "rating_choice == 'rating_imdb'"
+                  }
+                ],
+                "encoding": {
+                  "x": {
+                    "field": "season",
+                    "type": "ordinal",
+                    "scale": {
+                    "domain": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"]
+                  },
+                  "sort": "ascending",
+                  "title": "Seasons"
+                },
+                "y": {
+                  "field": "ep_num",
+                  "type": "ordinal",
+                  "scale": {
+                    "domain": ["17", "16", "15", "14", "13", "12", "11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"]
+                  },
+                  "title": "Episode Number"
+                },
+                "color": {
+                  "condition": {
+                    "param": "brush",
+                    "field": "rating_imdb",
+                    "title": "Ratings",
+                    "type": "quantitative",
+                    "scale": {
+                      "scheme": "redyellowgreen"
+                    }
+                  },
+                  "value": "lightgrey"
+                },
+                "opacity": {
+                  "condition": {
+                    "param": "select_heatmap",
+                    "value": 1 
+                  },
+                  "value": 0.2
+                },
+                "tooltip": [
+                  {
+                    "field": "episode_title",
+                    "title": "Title",
+                    "type": "nominal"
+                  },
+                  {
+                    "field": "season",
+                    "title": "Season",
+                    "type": "quantitative"
+                  },
+                  {
+                    "field": "ep_num",
+                    "title": "Episode",
+                    "type": "quantitative"
+                  },
+                  {
+                    "field": "first_aired",
+                    "title": "Air Date (UK)",
+                    "type": "temporal"
+                  },
+                  {
+                    "field": "rating_imdb",
+                    "title": "IMDB Rating",
+                    "type": "quantitative"
+                  },
+                  {
+                    "field": "duration",
+                    "title": "Episode Length (minutes)",
+                    "type": "quantitative"
+                  },
+                  {
+                    "field": "desc",
+                    "title": "Summary (IMDB)",
+                    "type": "nominal"
+                  }
+                ]
+              }
+            },
+            {
+              "mark": {
+                "type": "rect",
+                "tooltip": {
+                  "content": "data"
+                }
+              },
+              "transform": [
+                {
+                  "filter": "rating_choice == 'rating_AI'"
+                }
+              ],
+              "encoding": {
+                "x": {
+                  "field": "season",
+                  "type": "ordinal",
+                  "scale": {
+                  "domain": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"]
+                },
+                "sort": "ascending",
+                "title": "Seasons"
+              },
+              "y": {
+                "field": "ep_num",
+                "type": "ordinal",
+                "scale": {
+                  "domain": ["14", "13", "12", "11", "10", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"]
+                },
+                "title": "Episode Number"
+              },
+              "color": {
+                "condition": {
+                    "param": "brush",
+                    "field": "rating_AI",
+                    "type": "quantitative",
+                    "title": "Ratings",
+                    "scale": {
+                      "scheme": "redyellowgreen"
+                    }
+                  },
+                  "value": "lightgray"
+              },
+              "opacity": {
+                "condition": {
+                  "param": "select_heatmap",
+                  "value": 1
+                },
+                "value": 0.2
+              },
+              "tooltip": [
+                  {
+                    "field": "episode_title",
+                    "title": "Title",
+                    "type": "nominal"
+                  },
+                  {
+                    "field": "season",
+                    "title": "Season",
+                    "type": "quantitative"
+                  },
+                  {
+                    "field": "ep_num",
+                    "title": "Episode",
+                    "type": "quantitative"
+                  },
+                  {
+                    "field": "first_aired",
+                    "title": "Air Date (UK)",
+                    "type": "temporal"
+                  },
+                  {
+                    "field": "rating_AI",
+                    "title": "AI Rating",
+                    "type": "quantitative"
+                  },
+                  {
+                    "field": "duration",
+                    "title": "Episode Length (minutes)",
+                    "type": "quantitative"
+                  },
+                  {
+                    "field": "desc",
+                    "title": "Summary (IMDB)",
+                    "type": "nominal"
+                  }
+                ]
+            }
+          }
+        ]
+      }
+    ]
+    },
+    {
+      "width": 600,
+      "height": 250,
+      "title": "Viewership Over Show Run",
+      "mark": {
+        "type": "rect"
+      },
+      "params": [
+        {
+          "name": "brush",
+          "select": {
+            "type": "interval",
+            "encodings": ["x"]
+          }
+        }
+      ],
+      "transform": [
+        {
+          "filter": {"param": "select_heatmap"}
+        }
+      ],
+      "encoding": {
+        "y": {
+          "field": "uk_viewers",
+          "type": "quantitative",
+          "aggregate": "max",
+          "title": "Max Yearly UK Viewership (Millions)",
+          "scale": {
+            "domain": [0, 15]
+          }
+        },
+        "x": { 
+          "title": "Years on Air",
+          "field": "first_aired",
+          "type": "temporal",
+          "timeUnit": "year",
+          "scale": {
+            "domain": [2005, 2022]
+          }
+        },
+        "color": {
+          "condition": {
+            "param": "brush",
+            "value": "gold",
+            "empty": false
+          },
+          "title": "Show Runners",
+          "field": "Showrunner",
+          "type": "nominal",
+          "scale": {
+            "domain": ["Russell T Davies", "Steven Moffat", "Chris Chibnall"],
+            "scheme": "tableau10"
+          },
+          "legend": {
+            "values": ["Russell T Davies", "Steven Moffat", "Chris Chibnall"]
+          }
+        }
+      }
+    } 
+  ]
+}
